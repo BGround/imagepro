@@ -43,9 +43,34 @@ export async function GET(
           taskData.results.map(async (resultUrl: string, index: number) => {
             try {
               // 从 URL 提取文件扩展名
-              const urlPath = new URL(resultUrl).pathname;
-              const extMatch = urlPath.match(/\.(\w+)$/);
-              const extension = extMatch ? extMatch[1] : 'png';
+              // 支持代理URL格式(如 https://xxx.ai/base64encodedurl)
+              let extension = 'png';
+              const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+
+              // 尝试从URL路径提取扩展名
+              const urlPath = resultUrl.split('?')[0];
+              const lastSegment = urlPath.split('/').pop() || '';
+              const possibleExt = lastSegment.split('.').pop()?.toLowerCase();
+
+              if (possibleExt && validExtensions.includes(possibleExt)) {
+                extension = possibleExt;
+              } else {
+                // 检查是否是代理URL(路径是base64编码的URL)
+                try {
+                  const pathSegment = new URL(resultUrl).pathname.split('/').pop();
+                  if (pathSegment && pathSegment.length > 20) {
+                    const decoded = Buffer.from(pathSegment, 'base64').toString('utf-8');
+                    if (decoded.startsWith('http')) {
+                      const decodedExt = decoded.split('.').pop()?.split('?')[0]?.toLowerCase();
+                      if (decodedExt && validExtensions.includes(decodedExt)) {
+                        extension = decodedExt;
+                      }
+                    }
+                  }
+                } catch {
+                  // 解码失败，使用默认扩展名
+                }
+              }
 
               // 生成存储路径
               const now = new Date();

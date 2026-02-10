@@ -88,31 +88,47 @@ export class Storage {
     bucket,
     contentType,
     disposition = "inline",
+    retries = 3,
   }: {
     url: string;
     key: string;
     bucket?: string;
     contentType?: string;
     disposition?: "inline" | "attachment";
+    retries?: number;
   }) {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        if (!response.body) {
+          throw new Error("No body in response");
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        return this.uploadFile({
+          body: buffer,
+          key,
+          bucket,
+          contentType,
+          disposition,
+        });
+      } catch (error: any) {
+        lastError = error;
+        if (attempt < retries - 1) {
+          // 等待后重试，递增延迟
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+        }
+      }
     }
 
-    if (!response.body) {
-      throw new Error("No body in response");
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    return this.uploadFile({
-      body: buffer,
-      key,
-      bucket,
-      contentType,
-      disposition,
-    });
+    throw lastError || new Error("Download and upload failed after retries");
   }
 }
