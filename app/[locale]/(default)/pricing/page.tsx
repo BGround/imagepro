@@ -1,6 +1,5 @@
 import Pricing from "@/components/blocks/pricing";
-import { getPricingPage } from "@/services/page";
-import { generateSEOMetadata, generateProductSchema } from "@/lib/seo";
+import { generateSEOMetadata } from "@/lib/seo";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata({
@@ -21,17 +20,6 @@ export async function generateMetadata({
   });
 }
 
-export default async function PricingPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const page = await getPricingPage(locale);
-
-  if (!page.pricing) {
-    return null;
-  }
-
-  return <Pricing pricing={page.pricing} />;
+export default async function PricingPage() {
+  return <Pricing />;
 }

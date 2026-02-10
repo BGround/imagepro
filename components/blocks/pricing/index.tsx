@@ -2,169 +2,257 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Check, Zap } from "lucide-react";
-import { Pricing as PricingType } from "@/types/blocks/pricing";
-import { CountdownTimer } from "./countdown-timer";
+import { Check, X, HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-export default function Pricing({ pricing }: { pricing: PricingType }) {
-  const [activeTab, setActiveTab] = useState("yearly");
+interface PlanFeature {
+  text: string;
+  included: boolean;
+  tooltip?: string;
+}
 
-  if (!pricing || !pricing.items) {
-    return null;
-  }
+interface Plan {
+  id: string;
+  name: string;
+  price: {
+    monthly: number | "Free";
+    yearly: number | "Free";
+  };
+  description: string;
+  buttonText: string;
+  buttonDisabled?: boolean;
+  isFeatured?: boolean;
+  badges?: string[];
+  features: PlanFeature[];
+}
 
-  const handleCheckout = (item: any) => {
-    console.log("Checkout clicked for:", item);
+const plans: Plan[] = [
+  {
+    id: "free",
+    name: "Free",
+    price: { monthly: "Free", yearly: "Free" },
+    description: "Perfect for getting started",
+    buttonText: "Get Started",
+    buttonDisabled: true,
+    features: [
+      { text: "10 credits per day", included: true },
+      { text: "~10 Fast Mode images per day", included: true },
+      { text: "Unlimited Basic generations (Slow Queue)", included: true, tooltip: "Basic generations are processed in a slower queue with longer wait times" },
+      { text: "Basic features", included: true },
+      { text: "Community support", included: true },
+      { text: "~2 Raphael Videos/day", included: true, tooltip: "Video generation using the Raphael model" },
+      { text: "Images include watermark (free plan). Upgrade to remove.", included: false },
+      { text: "Basic model only (No Pro/Max/Ultra access)", included: false },
+    ],
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: { monthly: 20, yearly: 10 },
+    description: "",
+    buttonText: "Upgrade to Premium",
+    features: [
+      { text: "2,000 credits per month", included: true },
+      { text: "~2,000 Fast Mode images", included: true },
+      { text: "~400 Raphael Videos/mo", included: true, tooltip: "Monthly video generation allowance" },
+      { text: "Unlimited Basic generations", included: true, tooltip: "Generate unlimited images using basic models" },
+      { text: "Priority queue", included: true, tooltip: "Your generations are processed before free users" },
+      { text: "Unlock Raphael Pro (1K)", included: true, tooltip: "Access to Raphael Pro model with 1K resolution" },
+      { text: "No ads", included: true },
+      { text: "No watermarks", included: true },
+      { text: "Fast AI Photo Editor", included: true, tooltip: "Quick access to AI-powered photo editing tools" },
+    ],
+  },
+  {
+    id: "ultimate",
+    name: "Ultimate",
+    price: { monthly: 40, yearly: 20 },
+    description: "",
+    buttonText: "Upgrade to Ultimate",
+    isFeatured: true,
+    badges: ["Best Value", "Save 50%"],
+    features: [
+      { text: "5,000 credits per month", included: true },
+      { text: "~5,000 Fast Mode images", included: true },
+      { text: "~1,000 Raphael Videos/mo", included: true, tooltip: "Monthly video generation allowance" },
+      { text: "Unlimited Basic generations", included: true, tooltip: "Generate unlimited images using basic models" },
+      { text: "Highest priority queue", included: true, tooltip: "Your generations are processed first, before all other users" },
+      { text: "Unlock Raphael Pro (1K)", included: true, tooltip: "Access to Raphael Pro model with 1K resolution" },
+      { text: "Unlock Max (1.5K) & Ultra (2K)", included: true, tooltip: "Access to Max (1.5K) and Ultra (2K) resolution models" },
+      { text: "Full privacy", included: true, tooltip: "Your generations are not used for training or shared publicly" },
+      { text: "No ads", included: true },
+      { text: "No watermarks", included: true },
+      { text: "Instant AI Photo Editor", included: true, tooltip: "Instant access to AI-powered photo editing tools with no wait time" },
+      { text: "Advanced Refine feature", included: true, tooltip: "Fine-tune your generations with advanced controls" },
+      { text: "Early access to new features", included: true, tooltip: "Be the first to try new features before public release" },
+    ],
+  },
+];
+
+export default function Pricing() {
+  const [isYearly, setIsYearly] = useState(true);
+
+  const handleCheckout = (plan: Plan) => {
+    console.log("Checkout clicked for:", plan);
     alert("Payment integration removed. Please implement your own payment system.");
   };
 
-  const filteredItems = pricing.items.filter(
-    (item) => item.group === activeTab
-  );
+  const getPrice = (plan: Plan) => {
+    const price = isYearly ? plan.price.yearly : plan.price.monthly;
+    if (price === "Free") return "Free";
+    return `$${price}`;
+  };
+
+  const getPriceUnit = (plan: Plan) => {
+    if (plan.price.yearly === "Free") return "";
+    return "/month";
+  };
 
   return (
-    <section
-      id="pricing"
-      className="relative z-0 pb-14 md:pb-20 lg:pb-24"
-      style={{ paddingTop: 'calc(96px + var(--locale-banner-height, 0px))' }}
-    >
-      <div className="mx-auto mb-8 px-4 text-center md:mb-10 md:px-8">
-        <h1 className="sr-only">Z-Image Pricing</h1>
-        <h2 className="mb-6 text-3xl font-bold text-pretty lg:text-4xl">
-          {pricing.title || "Simple credit pricing"}
-        </h2>
-        <p className="text-muted-foreground mx-auto mb-4 max-w-xl lg:max-w-none lg:text-lg">
-          {pricing.subtitle || "Credits are usage units consumed per task, not a form of currency."}
-        </p>
-        {pricing.disclaimer && (
-          <p className="text-muted-foreground mx-auto mt-2 max-w-2xl text-xs text-gray-500">
-            {pricing.disclaimer}
-          </p>
-        )}
-      </div>
+    <TooltipProvider>
+      <section
+        id="pricing"
+        className="relative z-0 pb-14 md:pb-20 lg:pb-24"
+        style={{ paddingTop: 'calc(96px + var(--locale-banner-height, 0px))' }}
+      >
+        <div className="container">
+          {/* Header */}
+          <div id="plans" className="mx-auto mb-12 text-center scroll-mt-24">
+            <h2 className="mb-4 text-4xl font-semibold lg:text-5xl">Choose Your Plan</h2>
+            <p className="text-muted-foreground lg:text-lg">
+              Free images include a watermark. Upgrade for clean outputs, faster generation, and commercial use.
+            </p>
+          </div>
 
-      <div className="container">
-        <div className="relative z-10 mx-auto mt-6 mb-10 flex w-full justify-center md:mt-8 md:mb-12 md:max-w-lg">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="border inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
-              <TabsTrigger value="yearly" className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium">
-                Yearly
-              </TabsTrigger>
-              <TabsTrigger value="monthly" className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium">
-                Monthly
-              </TabsTrigger>
-              <TabsTrigger value="one-time" className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium">
-                Pay as you go
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+          {/* Toggle */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-4">
+              <span className={!isYearly ? "font-medium" : "text-muted-foreground"}>Monthly</span>
+              <Switch
+                checked={isYearly}
+                onCheckedChange={setIsYearly}
+              />
+              <div className="relative flex items-center">
+                <span className={isYearly ? "font-medium" : "text-muted-foreground"}>Yearly</span>
+                <div className="absolute -top-3.5 left-full -ml-1.5">
+                  <div className="inline-flex items-center border whitespace-nowrap rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-600 border-red-200 shadow-sm">
+                    Save 50%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <div className="relative z-0 mt-0 grid w-full gap-4 pt-4 md:gap-6 md:pt-6 lg:gap-8 md:grid-cols-3">
-          {filteredItems.map((item: any, index: number) => {
-            const isFeatured = item.is_featured || item.featured;
+          {/* Plans Grid */}
+          <div className="grid gap-6 md:grid-cols-3">
+            {plans.map((plan, index) => {
+              const orderClass = plan.id === "free"
+                ? "order-3 md:order-none"
+                : plan.id === "premium"
+                  ? "order-2 md:order-none"
+                  : "order-1 md:order-none";
 
-            return (
-              <Card
-                key={index}
-                data-slot="card"
-                className={`text-card-foreground flex flex-col gap-6 rounded-xl py-6 relative overflow-visible border transition-all duration-300 backdrop-blur ${
-                  isFeatured
-                    ? "border-amber-200/70 bg-[#0C0C10]/90 shadow-[0_20px_90px_rgba(0,0,0,0.65),0_0_55px_rgba(0,224,255,0.25)] ring-1 ring-amber-100/70 md:-translate-y-1 md:scale-[1.06] lg:scale-[1.1]"
-                    : "border-border/70 bg-card/80 hover:-translate-y-1 hover:shadow-[0_20px_40px_-30px_rgba(15,23,42,0.65)]"
-                }`}
-              >
-                {isFeatured && (
-                  <>
-                    <div className="pointer-events-none absolute inset-0 opacity-60 [background:radial-gradient(circle_at_18%_15%,rgba(77,168,255,0.14),transparent_38%),radial-gradient(circle_at_82%_0%,rgba(245,216,115,0.18),transparent_42%)]" />
-                    <div className="pointer-events-none absolute inset-0 opacity-45 [background:linear-gradient(120deg,transparent,rgba(255,211,106,0.45),transparent)] [background-size:200%_100%] animate-[shimmer_3.2s_linear_infinite]" />
-                    <span className="absolute inset-x-0 -top-3 mx-auto flex h-7 w-fit items-center rounded-full px-3 py-1 text-xs font-bold ring-1 ring-white/20 ring-offset-1 ring-offset-gray-950/5 bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-200 text-amber-900 shadow-[0_0_40px_rgba(255,211,106,0.55)]">
-                      {item.badge_icon || "⭐️ Most Popular"}
-                    </span>
-                  </>
-                )}
-
+              return (
                 <div
-                  data-slot="card-header"
-                  className={`@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 pb-3 md:pb-4 ${
-                    isFeatured ? "relative pt-5 md:pt-6 text-amber-50" : ""
+                  key={plan.id}
+                  className={`rounded-lg p-6 transition-all duration-300 hover:-translate-y-1 ${orderClass} ${
+                    plan.isFeatured
+                      ? "border-2 border-primary/80 bg-primary/5 shadow-xl shadow-primary/20 hover:shadow-xl"
+                      : plan.id === "free"
+                        ? "border border-muted/40 bg-card/60 hover:shadow-md"
+                        : "border border-muted hover:shadow-xl"
                   }`}
                 >
-                  <div data-slot="card-title" className="leading-none font-medium">
-                    <h3 className={isFeatured ? "text-[17px] font-semibold text-amber-100 md:text-lg" : "text-sm font-medium"}>
-                      {item.title}
-                    </h3>
-                  </div>
-
-                  <div className="my-3 flex items-baseline gap-2">
-                    <span className="text-muted-foreground text-sm line-through">
-                      ${item.original_price}
-                    </span>
-                    <div className={isFeatured ? "my-3 block font-semibold text-[30px] md:text-[34px]" : "my-3 block font-semibold text-2xl"}>
-                      <span className={isFeatured ? "bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-200 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(0,224,255,0.25)]" : "text-primary"}>
-                        ${item.price}/{item.unit}
-                      </span>
-                    </div>
-                  </div>
-
-                  {isFeatured && item.badge && (
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-amber-100">
-                      <div className="flex items-center gap-2">
-                        <Zap className="size-4 text-amber-200" />
-                        <Badge className="border-transparent bg-amber-200 text-amber-900 shadow-sm">
-                          {item.badge}
-                        </Badge>
+                  <div className="flex h-full flex-col justify-between gap-5">
+                    <div>
+                      {/* Plan Name & Badges */}
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <h3 className="text-xl font-semibold">{plan.name}</h3>
+                        {plan.isFeatured && (
+                          <>
+                            <Badge className="border-primary bg-primary px-1.5 text-primary-foreground">
+                              Best Value
+                            </Badge>
+                            <div className="inline-flex items-center border whitespace-nowrap rounded-full bg-red-50 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-red-600 border-red-200 shadow-sm">
+                              Save 50%
+                            </div>
+                          </>
+                        )}
                       </div>
-                    </div>
-                  )}
 
-                  <div data-slot="card-description" className="text-muted-foreground text-sm">
-                    {item.description}
+                      {/* Price */}
+                      <div className="mb-4">
+                        <span className="text-5xl font-semibold">{getPrice(plan)}</span>
+                        {getPriceUnit(plan) && (
+                          <span className="text-muted-foreground">{getPriceUnit(plan)}</span>
+                        )}
+                        {plan.price.yearly !== "Free" && isYearly && (
+                          <div className="text-sm text-muted-foreground mt-1">Billed Annually</div>
+                        )}
+                      </div>
+
+                      {/* Description */}
+                      {plan.description && (
+                        <p className="text-muted-foreground mb-6">{plan.description}</p>
+                      )}
+
+                      {/* Button */}
+                      <Button
+                        onClick={() => handleCheckout(plan)}
+                        disabled={plan.buttonDisabled}
+                        className={`w-full mb-6 ${
+                          plan.isFeatured
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/30 hover:shadow-xl"
+                            : plan.buttonDisabled
+                              ? "border border-muted/50 text-muted-foreground hover:text-foreground bg-background hover:bg-accent"
+                              : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        variant={plan.isFeatured ? "default" : "outline"}
+                        style={plan.buttonDisabled ? { pointerEvents: "none", opacity: 0.6 } : {}}
+                      >
+                        {plan.buttonText}
+                      </Button>
+
+                      {/* Features */}
+                      <ul className="flex flex-col gap-3">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex gap-2 items-start">
+                            {feature.included ? (
+                              <Check className="mt-1 size-4 shrink-0 text-primary" />
+                            ) : (
+                              <X className="mt-1 size-4 shrink-0 text-muted-foreground/70" />
+                            )}
+                            <span className={`flex items-center gap-1 ${!feature.included ? "text-muted-foreground" : ""}`}>
+                              {feature.text}
+                              {feature.tooltip && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs">{feature.tooltip}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-
-                  <Button
-                    onClick={() => handleCheckout(item)}
-                    className={`mt-4 w-full px-4 py-2 border-[0.5px] border-white/25 shadow-black/20 ${
-                      isFeatured
-                        ? "h-11 text-[15px] bg-[linear-gradient(90deg,#FFD36A,#F5D873)] text-slate-950 shadow-[0_0_24px_rgba(0,224,255,0.28)] hover:shadow-[0_0_32px_rgba(0,224,255,0.38)] font-bold"
-                        : "h-9 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                    }`}
-                  >
-                    <Zap className="size-4" />
-                    <span className="block">{item.button_text}</span>
-                  </Button>
-
-                  {isFeatured && item.limited_time_bonus && (
-                    <div className="mt-3 flex items-center justify-between rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-[12px] text-amber-100/90 shadow-[0_0_24px_rgba(0,0,0,0.45)]">
-                      <span className="flex items-center gap-2 font-semibold text-amber-200">
-                        <Zap className="size-4 text-amber-200" />
-                        Limited-time bonus
-                      </span>
-                      <CountdownTimer />
-                    </div>
-                  )}
                 </div>
-
-                <div data-slot="card-content" className="px-6 space-y-3 md:space-y-4">
-                  <hr className="border-dashed" />
-                  <p className="text-sm font-medium">What you get</p>
-                  <ul className="list-outside space-y-2 md:space-y-3 text-sm pricing-features">
-                    {item.features?.map((feature: string, idx: number) => (
-                      <li key={idx} className="flex items-center gap-2">
-                        <Check className="size-3 shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Card>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </TooltipProvider>
   );
 }

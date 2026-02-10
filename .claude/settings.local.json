@@ -11,7 +11,8 @@
       "Bash(pnpm dev:*)",
       "Bash(curl:*)",
       "Bash(pkill:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(pnpm exec tsc:*)"
     ],
     "deny": []
   }
