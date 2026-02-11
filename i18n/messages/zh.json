@@ -911,6 +911,7 @@
       "pleaseUploadImage": "请上传参考图片",
       "imageUploadSuccess": "图片上传成功！",
       "imageUploadFailed": "图片上传失败",
+      "imageSelected": "图片已选择，点击生成按钮开始",
       "pleaseUploadImageFile": "请上传图片文件",
       "imageTooLarge": "图片大小不能超过 10MB",
       "getModelsFailed": "获取模型列表失败",

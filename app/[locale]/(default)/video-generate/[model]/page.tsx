@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dialog";
 import { Sparkles, Languages, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import cosUploadService from "@/lib/cos-upload";
 import { useConsumptionItems } from "@/hooks/useConsumptionItems";
 import { mapVideoModelToConsumptionType } from "@/lib/model-consumption-mapping";
 import {
@@ -269,13 +268,13 @@ export default function VideoGeneratePage() {
       toast.error(t('toast.pleaseUploadImageFile'));
       return;
     }
-    
+
     if (file.size > 10 * 1024 * 1024) {
       toast.error(t('toast.imageTooLarge'));
       return;
     }
 
-    // 先显示预览
+    // 保存文件并显示预览
     setReferenceImage(file);
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -283,40 +282,8 @@ export default function VideoGeneratePage() {
     };
     reader.readAsDataURL(file);
 
-    // 上传到 COS
-    try {
-      setIsUploadingImage(true);
-      setUploadProgress(0);
-      
-      console.log('[I2V] 开始上传图片到 COS...');
-      const imageUrl = await cosUploadService.uploadFileWithRetry(
-        file,
-        'video-generation/audio', // 使用视频生成音频驱动类型
-        {
-          onProgress: (progress) => {
-            setUploadProgress(progress);
-            console.log('[I2V] 上传进度:', progress + '%');
-          },
-          onError: (error) => {
-            console.error('[I2V] 上传错误:', error);
-          }
-        }
-      );
-
-      setReferenceImageUrl(imageUrl);
-      console.log('[I2V] 图片上传成功:', imageUrl);
-      toast.success(t('toast.imageUploadSuccess'));
-    } catch (error) {
-      console.error('[I2V] 图片上传失败:', error);
-      toast.error(error instanceof Error ? error.message : t('toast.imageUploadFailed'));
-      // 上传失败时清除图片
-      setReferenceImage(null);
-      setReferenceImagePreview(null);
-      setReferenceImageUrl(null);
-    } finally {
-      setIsUploadingImage(false);
-      setUploadProgress(0);
-    }
+    // 图片会在生成时上传到 R2
+    toast.success(t('toast.imageSelected'));
   };
 
   const handleRemoveImage = () => {
@@ -528,11 +495,19 @@ export default function VideoGeneratePage() {
     poll();
   };
 
-  // Image to Video 轮询任务状态
+  // Image to Video 轮询任务状态 - 使用自适应间隔
   const pollI2VTaskStatus = async (taskId: string) => {
-    const maxAttempts = 60;
+    const maxAttempts = 120;
     let attempts = 0;
-    let currentProgress = 10; // 初始进度10%
+    let currentProgress = 10;
+
+    // 自适应轮询间隔：前期快，后期慢
+    const getInterval = (attempt: number) => {
+      if (attempt < 5) return 1000;   // 前5次: 1s
+      if (attempt < 15) return 2000;  // 接下来10次: 2s
+      if (attempt < 30) return 3000;  // 接下来15次: 3s
+      return 5000;                     // 之后: 5s
+    };
 
     const poll = async () => {
       try {
@@ -545,19 +520,17 @@ export default function VideoGeneratePage() {
         if (result.code === 1000 && result.data) {
           const { status, videoUrl, progress: taskProgress } = result.data;
 
-          // 模拟进度：如果后端返回了进度则使用后端进度，否则根据轮询次数模拟
           if (taskProgress !== null && taskProgress !== undefined) {
             setI2vProgress(taskProgress);
           } else {
-            // 模拟进度增长：每次随机增长0.5%-3%，确保进度平滑且不超过95%
-            const randomIncrement = 0.5 + Math.random() * 2.5; // 0.5-3之间的随机增长
+            const randomIncrement = 0.5 + Math.random() * 2.5;
             currentProgress = Math.min(currentProgress + randomIncrement, 95);
             setI2vProgress(Math.round(currentProgress));
           }
 
           if (status === 'success' && videoUrl) {
             console.log('[I2V] ✅ 视频生成成功，设置结果...');
-            setI2vProgress(100); // 成功时设置为100%
+            setI2vProgress(100);
             setGeneratedI2VVideo(videoUrl);
             setIsGeneratingI2V(false);
             toast.success(t('toast.videoGenerateSuccess'));
@@ -565,7 +538,6 @@ export default function VideoGeneratePage() {
           } else if (status === 'failed') {
             console.log('[I2V] ❌ 视频生成失败, error:', result.data.error);
             setIsGeneratingI2V(false);
-            // 优先使用 error 字段，如果没有则使用 errorMessage，最后使用默认消息
             const errorMsg = result.data.error || result.data.errorMessage || t('toast.videoGenerateFailed');
             toast.error(errorMsg);
             return;
@@ -573,13 +545,12 @@ export default function VideoGeneratePage() {
             console.log('[I2V] ⏳ 继续轮询...', `attempts: ${attempts + 1}/${maxAttempts}`);
             attempts++;
             if (attempts < maxAttempts) {
-              setTimeout(poll, 5000);
+              setTimeout(poll, getInterval(attempts));
             } else {
               setIsGeneratingI2V(false);
               toast.error(t('toast.generateTimeout'));
             }
           } else {
-            // 未知状态，停止轮询
             console.log('[I2V] ⚠️ 未知状态:', status);
             setIsGeneratingI2V(false);
             toast.error(`${t('toast.unknownTaskStatus')}: ${status}`);
@@ -593,7 +564,7 @@ export default function VideoGeneratePage() {
         console.error('[I2V] 查询状态异常:', error);
         attempts++;
         if (attempts < maxAttempts) {
-          setTimeout(poll, 5000);
+          setTimeout(poll, getInterval(attempts));
         } else {
           setIsGeneratingI2V(false);
           toast.error(t('toast.queryStatusFailed'));
@@ -601,6 +572,7 @@ export default function VideoGeneratePage() {
       }
     };
 
+    // 首次立即轮询
     poll();
   };
 
@@ -686,7 +658,7 @@ export default function VideoGeneratePage() {
       return;
     }
 
-    if (!referenceImageUrl) {
+    if (!referenceImage) {
       toast.error(t('toast.pleaseUploadImage'));
       return;
     }
@@ -695,32 +667,33 @@ export default function VideoGeneratePage() {
     setGeneratedI2VVideo(null);
     setI2vTaskId(null);
     setI2vProgress(0);
+    setIsUploadingImage(true);
 
     try {
       console.log('[I2V] 开始生成视频:', {
         prompt: i2vPrompt,
-        imageUrl: referenceImageUrl,
+        hasImage: !!referenceImage,
         model: i2vModel,
         duration: i2vDuration,
         resolution: i2vResolution,
         aspectRatio: i2vAspectRatio
       });
 
-      const response = await fetch('/api/ai/video-generate/create', {
+      // 使用合并的上传+生成接口
+      const formData = new FormData();
+      formData.append('image', referenceImage);
+      formData.append('prompt', i2vPrompt);
+      formData.append('duration', i2vDuration);
+      formData.append('resolution', i2vResolution);
+      formData.append('aspectRatio', i2vAspectRatio);
+      formData.append('enableAudio', String(i2vEnableAudio));
+
+      const response = await fetch('/api/ai/evolink/video/generate-with-image', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: i2vPrompt,
-          imageUrl: referenceImageUrl,
-          model: i2vModel,
-          duration: i2vDuration,
-          resolution: i2vResolution,
-          aspectRatio: i2vAspectRatio,
-          generateAudio: i2vEnableAudio,
-        }),
+        body: formData
       });
+
+      setIsUploadingImage(false);
 
       const result = await response.json();
       console.log('[I2V] API 响应:', result);
@@ -728,6 +701,9 @@ export default function VideoGeneratePage() {
       if (result.code === 1000 && result.data?.taskId) {
         const taskId = result.data.taskId;
         setI2vTaskId(taskId);
+        if (result.data.imageUrl) {
+          setReferenceImageUrl(result.data.imageUrl);
+        }
         toast.success(t('toast.taskCreated'));
         pollI2VTaskStatus(taskId);
       } else {
@@ -737,6 +713,7 @@ export default function VideoGeneratePage() {
     } catch (error) {
       console.error('[I2V] 生成异常:', error);
       setIsGeneratingI2V(false);
+      setIsUploadingImage(false);
       toast.error(t('toast.generateFailed'));
     }
   };
@@ -1311,11 +1288,11 @@ export default function VideoGeneratePage() {
 
                     <Button
                       onClick={handleI2VGenerate}
-                      disabled={!i2vPrompt || !referenceImageUrl || isGeneratingI2V || isUploadingImage}
+                      disabled={!i2vPrompt || !referenceImage || isGeneratingI2V}
                       className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-400 disabled:to-gray-500 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none transition-all rounded-lg font-medium"
                       size="lg"
                     >
-                      {isUploadingImage ? `${t('imageToVideo.uploading')} ${uploadProgress}%` : isGeneratingI2V ? `${t('imageToVideo.generating')} ${i2vProgress}%` : t('imageToVideo.generateButton')}
+                      {isUploadingImage ? t('imageToVideo.uploading') : isGeneratingI2V ? `${t('imageToVideo.generating')} ${i2vProgress}%` : t('imageToVideo.generateButton')}
                     </Button>
 
                     {/* 积分显示 */}

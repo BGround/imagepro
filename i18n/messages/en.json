@@ -909,6 +909,7 @@
       "pleaseUploadImage": "Please upload reference image",
       "imageUploadSuccess": "Image uploaded successfully!",
       "imageUploadFailed": "Image upload failed",
+      "imageSelected": "Image selected, click generate to start",
       "pleaseUploadImageFile": "Please upload an image file",
       "imageTooLarge": "Image size cannot exceed 10MB",
       "getModelsFailed": "Failed to get model list",
