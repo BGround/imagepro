@@ -122,6 +122,8 @@ export default function TextToImagePage() {
   const [i2iModel, setI2iModel] = useState("standard");
   const [i2iAspectRatio, setI2iAspectRatio] = useState("1:1");
   const [isGeneratingI2I, setIsGeneratingI2I] = useState(false);
+  const [i2iGenerationProgress, setI2iGenerationProgress] = useState(0);
+  const [i2iStatus, setI2iStatus] = useState<'idle' | 'uploading' | 'generating'>('idle');
   const [generatedI2IImage, setGeneratedI2IImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("text-to-image");
@@ -458,15 +460,21 @@ export default function TextToImagePage() {
         const taskId = result.data.id;
         console.log('[Evolink] 任务ID:', taskId);
 
-        // 轮询任务状态
-        const maxAttempts = 120;
-        const pollInterval = 2000;
+        // 轮询任务状态 - 使用自适应间隔（快速启动）
+        const maxAttempts = 60;
+        const getInterval = (attempt: number) => {
+          if (attempt < 5) return 500;   // 前5次: 500ms
+          if (attempt < 15) return 1000; // 接下来10次: 1s
+          return 2000;                    // 之后: 2s
+        };
 
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
-          await new Promise(resolve => setTimeout(resolve, pollInterval));
+          // 首次立即轮询，之后按间隔等待
+          if (attempt > 0) {
+            await new Promise(resolve => setTimeout(resolve, getInterval(attempt)));
+          }
 
           const statusResponse = await fetch(`/api/ai/evolink/task/${taskId}`);
-
           const statusResult = await statusResponse.json();
           console.log(`[Evolink] 轮询 ${attempt + 1}/${maxAttempts}, 状态:`, statusResult.data?.status, '进度:', statusResult.data?.progress);
 
@@ -573,14 +581,10 @@ export default function TextToImagePage() {
 
     setIsGeneratingI2I(true);
     setGeneratedI2IImage(null);
+    setI2iGenerationProgress(0);
+    setI2iStatus('uploading');
 
     try {
-      const formData = new FormData();
-      formData.append('image', referenceImage);
-      formData.append('prompt', i2iPrompt);
-      formData.append('model', i2iModel);  // 直接使用模型 id
-      formData.append('aspectRatio', i2iAspectRatio);
-
       console.log('[ImageToImage] 开始生成，参数:', {
         hasImage: !!referenceImage,
         prompt: i2iPrompt,
@@ -588,10 +592,97 @@ export default function TextToImagePage() {
         aspectRatio: i2iAspectRatio
       });
 
+      // 使用 Evolink API (nano-banana 模型)
+      if (i2iModel === 'nano-banana-2-lite') {
+        console.log('[ImageToImage] 使用 Evolink API');
+
+        const sizeMap: Record<string, string> = {
+          '1:1': '1:1',
+          '16:9': '16:9',
+          '9:16': '9:16',
+          '4:3': '4:3',
+          '3:4': '3:4'
+        };
+
+        // 使用合并的上传+生成接口
+        console.log('[ImageToImage] 调用 Evolink 生成接口（含图片上传）');
+        const formData = new FormData();
+        formData.append('image', referenceImage);
+        formData.append('prompt', i2iPrompt);
+        formData.append('size', sizeMap[i2iAspectRatio] || 'auto');
+        formData.append('quality', '2K');
+
+        const generateResponse = await fetch('/api/ai/evolink/generate-with-image', {
+          method: 'POST',
+          body: formData
+        });
+
+        const generateResult = await generateResponse.json();
+        console.log('[ImageToImage] Evolink 创建任务响应:', generateResult);
+        setI2iStatus('generating');
+
+        if (generateResult.code !== 1000) {
+          throw new Error(generateResult.message || 'Generation failed');
+        }
+
+        const taskId = generateResult.data.id;
+        console.log('[ImageToImage] 任务ID:', taskId);
+
+        // 轮询任务状态 - 使用自适应间隔（快速启动）
+        const maxAttempts = 60;
+        const getInterval = (attempt: number) => {
+          if (attempt < 5) return 500;   // 前5次: 500ms
+          if (attempt < 15) return 1000; // 接下来10次: 1s
+          return 2000;                    // 之后: 2s
+        };
+
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          // 首次立即轮询，之后按间隔等待
+          if (attempt > 0) {
+            await new Promise(resolve => setTimeout(resolve, getInterval(attempt)));
+          }
+
+          const statusResponse = await fetch(`/api/ai/evolink/task/${taskId}`);
+          const statusResult = await statusResponse.json();
+          console.log(`[ImageToImage] 轮询 ${attempt + 1}/${maxAttempts}, 状态:`, statusResult.data?.status, '进度:', statusResult.data?.progress);
+
+          if (statusResult.code !== 1000) {
+            throw new Error(statusResult.message || 'Task query failed');
+          }
+
+          const taskData = statusResult.data;
+
+          if (taskData.progress !== null && taskData.progress !== undefined) {
+            setI2iGenerationProgress(taskData.progress);
+          }
+
+          if (taskData.status === 'completed' && taskData.results && taskData.results.length > 0) {
+            console.log('[ImageToImage] 生成完成，图片URL:', taskData.results[0]);
+            setI2iGenerationProgress(100);
+            setGeneratedI2IImage(taskData.results[0]);
+            toast.success(t('generation_success'));
+            return;
+          }
+
+          if (taskData.status === 'failed') {
+            throw new Error('Image generation failed');
+          }
+        }
+
+        throw new Error('Task timeout');
+      }
+
+      // 其他模型使用通用 API (保留原有逻辑作为备用)
+      const formData = new FormData();
+      formData.append('image', referenceImage);
+      formData.append('prompt', i2iPrompt);
+      formData.append('model', i2iModel);
+      formData.append('aspectRatio', i2iAspectRatio);
+
       const response = await fetch('/api/ai/image-to-image', {
         method: 'POST',
         headers: {
-          'language': locale,  // 添加语言头
+          'language': locale,
         },
         body: formData,
       });
@@ -599,16 +690,12 @@ export default function TextToImagePage() {
       const result = await response.json();
       console.log('[ImageToImage] API 响应:', result);
 
-      // 检查登录失效
       if (result.code === 401 || response.status === 401) {
         console.error('[ImageToImage] 登录失效:', result.message);
-
-        // 触发登录失效事件，打开登录弹窗
         authEventBus.emit({
           type: 'login-expired',
           message: result.message || t('login_expired')
         });
-
         toast.error(result.message || t('login_expired'));
         return;
       }
@@ -621,11 +708,12 @@ export default function TextToImagePage() {
         console.error('[ImageToImage] 生成失败:', result);
         toast.error(result.message || t('generation_failed'));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[ImageToImage] 生成异常:', error);
-      toast.error(t('generation_error'));
+      toast.error(error.message || t('generation_error'));
     } finally {
       setIsGeneratingI2I(false);
+      setI2iStatus('idle');
     }
   };
 
@@ -1083,7 +1171,20 @@ export default function TextToImagePage() {
                   {isGeneratingI2I ? (
                     <div className="text-center">
                       <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                      <p className="text-muted-foreground">Generating your image...</p>
+                      <p className="text-muted-foreground mb-3">
+                        {i2iStatus === 'uploading' ? 'Uploading image...' : 'Generating your image...'}
+                      </p>
+                      {i2iStatus === 'generating' && (
+                        <div className="w-full max-w-xs mx-auto">
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-purple-600 rounded-full transition-all duration-500"
+                              style={{ width: `${i2iGenerationProgress}%` }}
+                            />
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">{i2iGenerationProgress}%</p>
+                        </div>
+                      )}
                     </div>
                   ) : generatedI2IImage ? (
                     <div className="w-full">
