@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "Pixmind",
+      "title": "imgvid",
       "logo": {
         "src": "/logo.png",
-        "alt": "Pixmind"
+        "alt": "imgvid"
       },
       "url": "/"
     },
@@ -35,11 +35,6 @@
               "icon": "RiVideoUploadLine"
             }
           ]
-        },
-        {
-          "title": "AI 视频特效",
-          "url": "/video-effects",
-          "icon": "RiVideoLine"
         },
         {
           "title": "图像工具",
@@ -165,15 +160,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "Pixmind",
+      "title": "imgvid",
       "description": "使用我们的 AI 驱动的提示词生成工具，将您的创意愿景变为现实。将图片转换为提示词，增强文本提示词，并生成惊艳的视觉效果。",
       "logo": {
         "src": "/logo.png",
-        "alt": "Pixmind"
+        "alt": "imgvid"
       },
       "url": "/"
     },
-    "copyright": "© 2025 • Pixmind 保留所有权利。  pixmind.service@aimix.pro",
+    "copyright": "© 2025 • imgvid 保留所有权利。  pixmind.service@aimix.pro",
     "nav": {
       "items": [
         {

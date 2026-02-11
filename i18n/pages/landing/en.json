@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "Pixmind",
+      "title": "imgvid.dev",
       "logo": {
         "src": "/logo.png",
-        "alt": "Pixmind"
+        "alt": "imgvid.dev"
       },
       "url": "/"
     },
@@ -35,11 +35,6 @@
               "icon": "RiVideoUploadLine"
             }
           ]
-        },
-        {
-          "title": "AI Video Effects",
-          "url": "/video-effects",
-          "icon": "RiVideoLine"
         },
         {
           "title": "Image Tools",
@@ -165,15 +160,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "Pixmind",
+      "title": "imgvid.dev",
       "description": "Transform your creative vision into reality with our AI-powered prompt generation tools. Convert images to prompts, enhance text prompts, and generate stunning visuals.",
       "logo": {
         "src": "/logo.png",
-        "alt": "Pixmind"
+        "alt": "imgvid.dev"
       },
       "url": "/"
     },
-    "copyright": "© 2025 • Pixmind. All rights reserved.  pixmind.service@aimix.pro",
+    "copyright": "© 2025 • imgvid.dev. All rights reserved.  pixmind.service@aimix.pro",
     "nav": {
       "items": [
         {

@@ -12,32 +12,32 @@
   },
   "seo": {
     "home": {
-      "title": "免费图像转提示词生成器 - AI图片提示词工具 | Pixmind",
+      "title": "免费图像转提示词生成器 - AI图片提示词工具 | imgvid",
       "description": "最强大的AI图像提示词生成器。即时将任何图像转换为详细提示词,完美支持Midjourney、DALL-E、Stable Diffusion等平台。",
       "keywords": "图像转提示词,AI提示词生成器,图片提示词,Midjourney,DALL-E,Stable Diffusion,文本转提示词"
     },
     "studio": {
-      "title": "AI图像生成工作室 - 文本转图像工具 | Pixmind",
+      "title": "AI图像生成工作室 - 文本转图像工具 | imgvid",
       "description": "强大的在线AI图像生成工具。支持文本转图像、提示词增强、多模型选择。实时预览,一键生成,适用于艺术创作、设计、营销等场景。",
       "keywords": "AI图像生成,文本转图像,提示词工具,图像生成器,AI艺术创作"
     },
     "avatars": {
-      "title": "AI图像模型库 - 多种图像生成模型 | Pixmind",
+      "title": "AI图像模型库 - 多种图像生成模型 | imgvid",
       "description": "提供多种专业AI图像生成模型,包括Flux、Stable Diffusion、Midjourney等。支持不同风格和场景的图像生成需求。",
       "keywords": "AI图像模型,Flux,Stable Diffusion,图像生成,AI艺术"
     },
     "voice": {
-      "title": "AI提示词增强 - 智能提示词优化工具 | Pixmind",
+      "title": "AI提示词增强 - 智能提示词优化工具 | imgvid",
       "description": "智能AI提示词增强技术,自动优化和丰富您的图像提示词。支持多语言,适用于各种AI图像生成平台。",
       "keywords": "提示词增强,提示词优化,AI提示词,图像生成,多语言支持"
     },
     "pricing": {
-      "title": "定价方案 - 灵活套餐,免费试用 | Pixmind",
+      "title": "定价方案 - 灵活套餐,免费试用 | imgvid",
       "description": "透明的AI图像生成价格方案。提供免费额度,按需付费或订阅套餐可选。支持API调用。",
       "keywords": "AI图像生成价格,提示词生成费用,订阅套餐,API服务"
     },
     "blog": {
-      "title": "AI图像提示词教程与案例 - 图像生成指南 | Pixmind",
+      "title": "AI图像提示词教程与案例 - 图像生成指南 | imgvid",
       "description": "AI图像提示词技术教程、应用案例、最佳实践。涵盖Midjourney、DALL-E、Stable Diffusion等平台的实战经验分享。",
       "keywords": "AI提示词教程,图像生成案例,Midjourney教程,提示词技巧"
     }
@@ -1182,7 +1182,7 @@
     "title": "关于我们",
     "subtitle": "让每个人都能使用AI创作",
     "story_title": "我们的故事",
-    "story_content": "我们创建Pixmind是因为AI艺术创作变得越来越强大，但对许多人来说仍然具有挑战性。我们相信每个人都应该有机会通过AI表达创造力，无论技术背景或语言能力如何。",
+    "story_content": "我们创建imgvid是因为AI艺术创作变得越来越强大，但对许多人来说仍然具有挑战性。我们相信每个人都应该有机会通过AI表达创造力，无论技术背景或语言能力如何。",
     "mission_title": "我们的使命",
     "mission_content": "让AI艺术创作对每个人来说都更加直观和易用，打破技术障碍和语言限制。",
     "values_title": "我们的价值观",
@@ -1196,11 +1196,11 @@
     "contact_title": "联系我们",
     "contact_content": "对合作感兴趣？我们欢迎技术集成和内容创作方面的咨询。",
     "contact_button": "联系我们",
-    "copyright": "© 2025 Pixmind. 保留所有权利。"
+    "copyright": "© 2025 imgvid. 保留所有权利。"
   },
   "affiliateProgram": {
     "title": "分销合作计划",
-    "subtitle": "推广Pixmind并赚取持续佣金",
+    "subtitle": "推广imgvid并赚取持续佣金",
     "commission_title": "赚取30%佣金",
     "commission_desc": "首年所有订阅付款（包括续订和升级）均可获得佣金",
     "benefits_title": "计划优势",
@@ -1232,14 +1232,14 @@
     "apply_desc": "准备加入我们的分销计划？请发送电子邮件告诉我们：",
     "apply_step1": "您的详细信息和背景",
     "apply_step2": "您的推广策略或平台",
-    "apply_step3": "您计划如何推广Pixmind",
+    "apply_step3": "您计划如何推广imgvid",
     "apply_note": "我们的团队将审核您的申请并提供后续步骤指导。",
     "step1": "1",
     "step1_desc": "您的详细信息和背景",
     "step2": "2",
     "step2_desc": "您的推广策略或平台",
     "step3": "3",
-    "step3_desc": "您计划如何推广Pixmind",
+    "step3_desc": "您计划如何推广imgvid",
     "apply_button": "立即申请: pixmind.service@aimix.pro",
     "review_desc": "我们的团队将审核您的申请并提供后续步骤指导。",
     "faq_title": "常见问题",
@@ -1253,7 +1253,7 @@
   "contact": {
     "title": "联系我们",
     "subtitle": "有问题吗？我们很乐意听到您的声音。通过以下渠道与我们联系。",
-    "testimonial_title": "喜欢Pixmind吗？",
+    "testimonial_title": "喜欢imgvid吗？",
     "testimonial_content": "分享您的体验！您的推荐能够激励他人，帮助我们改进。",
     "testimonial_button": "分享您的推荐",
     "email_title": "发送邮件",
@@ -1268,7 +1268,7 @@
     "title": "API文档",
     "subtitle": "通过我们强大的API将AI图像功能集成到您的应用程序中",
     "overview_title": "概述",
-    "overview_desc": "Pixmind提供目前处于测试阶段的API服务，用于将AI图像功能集成到您的应用程序中。我们的API提供与我们网页界面相同的强大功能。",
+    "overview_desc": "imgvid提供目前处于测试阶段的API服务，用于将AI图像功能集成到您的应用程序中。我们的API提供与我们网页界面相同的强大功能。",
     "available_apis_title": "可用的API",
     "image_to_prompt_title": "图像转提示词",
     "image_to_prompt_desc": "从图像生成详细、描述性的图像提示词",
@@ -1507,7 +1507,7 @@
     },
     "effects": {
       "title": "使用这些热门的 AI 视频效果将文本和图像转换为视频",
-      "description": "Pixmind AI 提供各种创新的 AI 视频效果，包括 AI Kiss、AI Hug、AI Inflate 等。现在就使用这些热门的 AI 视频生成器释放您的创造力！"
+      "description": "imgvid AI 提供各种创新的 AI 视频效果，包括 AI Kiss、AI Hug、AI Inflate 等。现在就使用这些热门的 AI 视频生成器释放您的创造力！"
     }
   },
   "affiliate": {

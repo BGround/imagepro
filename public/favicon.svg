@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Mountain/landscape -->
+  <path d="M80 390 L170 220 L230 280 L320 150 L430 390Z" fill="white" opacity="0.92"/>
+  <!-- Sun -->
+  <circle cx="160" cy="175" r="45" fill="white" opacity="0.92"/>
+  <!-- Play triangle (video indicator) -->
+  <path d="M290 270 L400 340 L290 410Z" fill="white" opacity="0.65"/>
+</svg>

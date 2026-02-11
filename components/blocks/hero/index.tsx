@@ -43,7 +43,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
 
             <h1 className="text-5xl lg:text-7xl font-bold mb-6 animate-fade-in-up">
               <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 dark:from-white dark:via-blue-200 dark:to-indigo-200 bg-clip-text text-transparent">
-                Pixmind
+                imgvid
               </span>
             </h1>
 

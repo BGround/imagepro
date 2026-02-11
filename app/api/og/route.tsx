@@ -10,7 +10,7 @@ export const runtime = 'edge'
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl
-    const title = searchParams.get('title') || 'Pixmind'
+    const title = searchParams.get('title') || 'imgvid'
     const description = searchParams.get('description') || 'AI Image Generation & Analysis Platform'
 
     return new ImageResponse(
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                🎨 Pixmind
+                🎨 imgvid
               </div>
             </div>
 

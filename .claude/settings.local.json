@@ -12,7 +12,13 @@
       "Bash(curl:*)",
       "Bash(pkill:*)",
       "Bash(rg:*)",
-      "Bash(pnpm exec tsc:*)"
+      "Bash(pnpm exec tsc:*)",
+      "Bash(pnpm list:*)",
+      "Bash(node -e:*)",
+      "Bash(qlmanage:*)",
+      "Bash(sips:*)",
+      "Bash(brew list:*)",
+      "Bash(python3:*)"
     ],
     "deny": []
   }

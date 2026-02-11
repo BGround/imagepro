@@ -6,57 +6,57 @@
     "page_info": "Page {{current}} of {{total}}"
   },
   "metadata": {
-    "title": "Pixmind - AI Image Generation & Analysis Platform",
+    "title": "imgvid - AI Image Generation & Analysis Platform",
     "description": "Transform images into detailed prompts and generate stunning AI images. Professional AI tools for image analysis and creation.",
-    "keywords": "Pixmind, AI image generation, image analysis, text to image, image to text, AI art, prompt generator"
+    "keywords": "imgvid, AI image generation, image analysis, text to image, image to text, AI art, prompt generator"
   },
   "seo": {
     "home": {
-      "title": "Free AI Pixmind Generator - Create Professional Avatar Videos | Pixmind",
-      "description": "Professional AI Pixmind video platform with avatar cloning, voice cloning, and 175+ language TTS. Create HD Pixmind videos in 1 minute without cameras or actors. Free trial.",
-      "keywords": "Pixmind,AI avatar,avatar video,virtual presenter,avatar cloning,voice cloning,TTS synthesis,text to video,virtual human generator"
+      "title": "Free AI imgvid Generator - Create Professional Avatar Videos | imgvid",
+      "description": "Professional AI imgvid video platform with avatar cloning, voice cloning, and 175+ language TTS. Create HD imgvid videos in 1 minute without cameras or actors. Free trial.",
+      "keywords": "imgvid,AI avatar,avatar video,virtual presenter,avatar cloning,voice cloning,TTS synthesis,text to video,virtual human generator"
     },
     "studio": {
-      "title": "Online Pixmind Video Studio - AI Avatar Creator | Pixmind",
-      "description": "Powerful online Pixmind video creation tool. Support text-to-video, multilingual dubbing, custom avatars. Real-time preview, one-click generation for education, marketing, and training.",
-      "keywords": "Pixmind creator,online video generator,AI video tool,text to video,avatar studio,video creation platform"
+      "title": "Online imgvid Video Studio - AI Avatar Creator | imgvid",
+      "description": "Powerful online imgvid video creation tool. Support text-to-video, multilingual dubbing, custom avatars. Real-time preview, one-click generation for education, marketing, and training.",
+      "keywords": "imgvid creator,online video generator,AI video tool,text to video,avatar studio,video creation platform"
     },
     "avatars": {
-      "title": "1000+ AI Pixmind Avatars Library - Free Avatar Templates | Pixmind",
+      "title": "1000+ AI imgvid Avatars Library - Free Avatar Templates | imgvid",
       "description": "1000+ professional AI avatars for business, education, service, sales, and entertainment. Support custom cloning, create your digital twin from a single photo.",
-      "keywords": "AI avatars,Pixmind library,virtual presenter,avatar templates,custom avatar,avatar cloning"
+      "keywords": "AI avatars,imgvid library,virtual presenter,avatar templates,custom avatar,avatar cloning"
     },
     "voice": {
-      "title": "AI Voice Cloning - High-Fidelity Voice Synthesis | Pixmind",
+      "title": "AI Voice Cloning - High-Fidelity Voice Synthesis | imgvid",
       "description": "Advanced AI voice cloning technology, replicate voice characteristics with just 5 minutes of audio. Support 175+ languages for avatar dubbing, audiobooks, and customer service.",
       "keywords": "voice cloning,AI dubbing,voice synthesis,TTS technology,voice replication,AI voice"
     },
     "pricing": {
-      "title": "Pixmind Video Pricing - Flexible Plans, Free Trial | Pixmind",
-      "description": "Transparent pricing for AI Pixmind videos. Free credits available, pay-as-you-go or subscription plans. Enterprise bulk customization with exclusive discounts, API support.",
-      "keywords": "Pixmind pricing,AI video cost,avatar plans,enterprise custom,API service"
+      "title": "imgvid Video Pricing - Flexible Plans, Free Trial | imgvid",
+      "description": "Transparent pricing for AI imgvid videos. Free credits available, pay-as-you-go or subscription plans. Enterprise bulk customization with exclusive discounts, API support.",
+      "keywords": "imgvid pricing,AI video cost,avatar plans,enterprise custom,API service"
     },
     "blog": {
-      "title": "Pixmind Case Studies & Tutorials - AI Video Guide | Pixmind",
-      "description": "Pixmind application cases, creation tutorials, and industry solutions. Covering education, e-commerce, corporate communication, and customer service AI.",
-      "keywords": "Pixmind cases,AI video tutorial,avatar applications,industry solutions,creation guide"
+      "title": "imgvid Case Studies & Tutorials - AI Video Guide | imgvid",
+      "description": "imgvid application cases, creation tutorials, and industry solutions. Covering education, e-commerce, corporate communication, and customer service AI.",
+      "keywords": "imgvid cases,AI video tutorial,avatar applications,industry solutions,creation guide"
     }
   },
   "landing": {
     "hero": {
-      "badge": "Free AI Pixmind Generator",
+      "badge": "Free AI imgvid Generator",
       "subtitle": "Avatar Cloning · Voice Cloning · 175+ Language TTS · 1-Minute Video Generation",
-      "description": "Professional AI Pixmind platform with 1000+ avatar library, 4K HD output support. No camera or actors needed, starting from $1",
+      "description": "Professional AI imgvid platform with 1000+ avatar library, 4K HD output support. No camera or actors needed, starting from $1",
       "start_creating": "Start Creating",
       "join_discord": "Join Discord",
       "showcase_title": "Core Features Showcase",
-      "showcase_subtitle": "Experience the power of AI Pixmind technology",
+      "showcase_subtitle": "Experience the power of AI imgvid technology",
       "explore_more": "Explore More AI Features",
       "video_showcases": {
         "digital_anchor": {
           "title": "AI Digital Anchor",
           "description": "Realistic digital anchor supporting multilingual broadcasting",
-          "category": "Pixmind"
+          "category": "imgvid"
         },
         "avatar_clone": {
           "title": "Avatar Clone Demo",
@@ -215,7 +215,7 @@
   },
   "my_orders": {
     "title": "My Orders",
-    "description": "orders paid with Pixmind.",
+    "description": "orders paid with imgvid.",
     "no_orders": "No orders found",
     "tip": "",
     "activate_order": "Activate Order",
@@ -381,7 +381,7 @@
   },
   "blog": {
     "title": "Blog & Tutorials",
-    "description": "News, resources, and updates about Pixmind",
+    "description": "News, resources, and updates about imgvid",
     "read_more_text": "Read More",
     "subtitle": "Learn about AI image prompts, tips, and best practices",
     "category_tutorial": "Tutorial",
@@ -474,7 +474,7 @@
     "edit_invite_link": "Edit Invite Link",
     "copy_invite_link": "Copy Invite Link",
     "invite_code": "Invite Code",
-    "invite_tip": "Invite 1 friend to buy Pixmind credits, reward $50.",
+    "invite_tip": "Invite 1 friend to buy imgvid credits, reward $50.",
     "invite_balance": "Invite Reward Balance",
     "total_invite_count": "Total Invite Count",
     "total_paid_count": "Total Paid Count",
@@ -482,7 +482,7 @@
     "update_invite_code": "Set Invite Code",
     "update_invite_code_tip": "Input your custom invite code",
     "update_invite_button": "Save",
-    "no_orders": "You can't invite others before you bought Pixmind credits",
+    "no_orders": "You can't invite others before you bought imgvid credits",
     "no_affiliates": "You're not allowed to invite others, please contact us to apply for permission.",
     "table": {
       "invite_time": "Invite Time",
@@ -500,7 +500,7 @@
     "submit": "Submit",
     "loading": "Submitting...",
     "contact_tip": "Other ways to contact us",
-    "rating_tip": "How do you feel about Pixmind?",
+    "rating_tip": "How do you feel about imgvid?",
     "placeholder": "Leave your words here..."
   },
   "ai_image": {
@@ -1158,7 +1158,7 @@
     "title": "About Us",
     "subtitle": "Empowering Everyone to Create with AI",
     "story_title": "Our Story",
-    "story_content": "We founded Pixmind because AI art creation was becoming increasingly powerful yet remained challenging for many to master. We believe everyone deserves the opportunity to express creativity through AI, regardless of technical background or language proficiency.",
+    "story_content": "We founded imgvid because AI art creation was becoming increasingly powerful yet remained challenging for many to master. We believe everyone deserves the opportunity to express creativity through AI, regardless of technical background or language proficiency.",
     "mission_title": "Our Mission",
     "mission_content": "To make AI art creation more intuitive and accessible to everyone, breaking down technical barriers and language limitations.",
     "values_title": "Our Values",
@@ -1172,12 +1172,12 @@
     "contact_title": "Get in Touch",
     "contact_content": "Interested in collaboration? We welcome inquiries in technical integration and content creation.",
     "contact_button": "Contact Us",
-    "copyright": "© 2025 Pixmind. All rights reserved."
+    "copyright": "© 2025 imgvid. All rights reserved."
   },
   "contact": {
     "title": "Contact Us",
     "subtitle": "Have questions? We'd love to hear from you. Get in touch with us through the following channels.",
-    "testimonial_title": "Loving Pixmind?",
+    "testimonial_title": "Loving imgvid?",
     "testimonial_content": "Share your experience! Your testimonial inspires others and helps us improve.",
     "testimonial_button": "Share Your Testimonial",
     "email_title": "Email Us",
@@ -1359,7 +1359,7 @@
     },
     "effects": {
       "title": "Transform Text & Images into Videos with These Trending AI Video Effects",
-      "description": "Pixmind AI provides a variety of innovative AI video effects, including AI Kiss, AI Hug, AI Inflate, and more. Unleash your creativity now with these trending AI video generators!"
+      "description": "imgvid AI provides a variety of innovative AI video effects, including AI Kiss, AI Hug, AI Inflate, and more. Unleash your creativity now with these trending AI video generators!"
     }
   },
   "affiliate": {

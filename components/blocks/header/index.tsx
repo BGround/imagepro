@@ -108,8 +108,8 @@ export default function Header({ header }: { header: HeaderType }) {
                 <img
                   src={header.brand.logo.src}
                   alt="ImagetoPrompt"
-                  className="w-8"
-                  style={{width: '145px', height: '45px'}}
+                  className="h-10"
+                  style={{height: '40px', width: 'auto'}}
                 />
               )}
               {/* {header.brand?.title && (
@@ -337,11 +337,6 @@ export default function Header({ header }: { header: HeaderType }) {
                   style={{width: '150px'}}
                 />
               )}
-              {header.brand?.title && (
-                <span className="text-xl font-bold">
-                  {header.brand?.title || ""}
-                </span>
-              )}
             </Link>
             <Sheet>
               <SheetTrigger asChild>
@@ -362,11 +357,6 @@ export default function Header({ header }: { header: HeaderType }) {
                           alt="ImagetoPrompt"
                           style={{width: '150px'}}
                         />
-                      )}
-                      {header.brand?.title && (
-                        <span className="text-xl font-bold">
-                          {header.brand?.title || ""}
-                        </span>
                       )}
                     </Link>
                   </SheetTitle>
