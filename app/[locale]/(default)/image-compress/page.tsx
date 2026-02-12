@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,9 +28,14 @@ export default function ImageCompressPage() {
   const [outputFormat, setOutputFormat] = useState<OutputFormat>("auto");
   const [progress, setProgress] = useState(0);
   const [currentFile, setCurrentFile] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const processingRef = useRef(false);
 
-  // 前端WebP压缩
-  const compressImageToWebP = async (file: File): Promise<Blob> => {
+  // Browser-based image compression using Canvas API
+  const compressImageInBrowser = async (
+    file: File,
+    targetFormat: "webp" | "png" | "jpeg"
+  ): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -44,6 +49,7 @@ export default function ImageCompressPage() {
           let width = img.width;
           let height = img.height;
 
+          // Limit max dimension to 4096px
           const maxDimension = 4096;
           if (width > maxDimension || height > maxDimension) {
             if (width > height) {
@@ -64,16 +70,27 @@ export default function ImageCompressPage() {
             ctx.drawImage(img, 0, 0, width, height);
           }
 
+          // Determine MIME type and quality
+          const mimeType =
+            targetFormat === "jpeg"
+              ? "image/jpeg"
+              : targetFormat === "png"
+              ? "image/png"
+              : "image/webp";
+
+          // PNG doesn't use quality parameter, JPEG/WebP use 0.85
+          const quality = targetFormat === "png" ? undefined : 0.85;
+
           canvas.toBlob(
             (blob) => {
               if (blob) {
                 resolve(blob);
               } else {
-                reject(new Error("WebP compression failed"));
+                reject(new Error(`${targetFormat.toUpperCase()} compression failed`));
               }
             },
-            "image/webp",
-            0.85
+            mimeType,
+            quality
           );
         };
         img.onerror = () => reject(new Error("Failed to load image"));
@@ -82,116 +99,41 @@ export default function ImageCompressPage() {
     });
   };
 
-  // 后端API压缩（PNG/JPEG）
-  const compressImageViaAPI = async (file: File, format: "png" | "jpeg"): Promise<{ blob: Blob; compressedSize: number; compressedUrl: string }> => {
-    const reader = new FileReader();
-    const base64 = await new Promise<string>((resolve, reject) => {
-      reader.onload = (e) => resolve(e.target?.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-    const response = await fetch('/api/image-slimCompress', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        imageBase64: base64,
-        format: format,
-        quality: 80,
-        mode: 'url'
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'API compression failed');
-    }
-
-    const result = await response.json();
-
-    // 检查返回的数据结构 (code 1000 表示成功)
-    if (result.code !== 1000 && result.code !== 0) {
-      throw new Error(result.message || 'API returned error');
-    }
-
-    const data = result.data;
-
-    // 直接下载压缩后的图片，通过代理API
-    if (data.compressedUrl) {
-      const proxyUrl = `/api/image-download?url=${encodeURIComponent(data.compressedUrl)}`;
-      const imageResponse = await fetch(proxyUrl);
-      const blob = await imageResponse.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      return {
-        blob: blob,
-        compressedSize: data.compressedSize,
-        compressedUrl: blobUrl
-      };
-    } else if (data.url) {
-      const proxyUrl = `/api/image-download?url=${encodeURIComponent(data.url)}`;
-      const imageResponse = await fetch(proxyUrl);
-      const blob = await imageResponse.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      return {
-        blob: blob,
-        compressedSize: data.compressedSize,
-        compressedUrl: blobUrl
-      };
-    } else if (data.imageBase64) {
-      // 如果返回base64，转换为blob
-      const base64Data = data.imageBase64.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: `image/${format}` });
-      const blobUrl = URL.createObjectURL(blob);
-      return {
-        blob: blob,
-        compressedSize: data.compressedSize || byteArray.length,
-        compressedUrl: blobUrl
-      };
-    }
-
-    throw new Error('Invalid API response: no url or imageBase64');
-  };
-
-  const compressImage = async (file: File, format: OutputFormat): Promise<{ blob: Blob; compressedSize: number; compressedUrl: string }> => {
-    // 确定目标格式
+  const compressImage = async (
+    file: File,
+    format: OutputFormat
+  ): Promise<{ blob: Blob; compressedSize: number; compressedUrl: string }> => {
+    // Determine target format
     let targetFormat: "webp" | "png" | "jpeg" = "webp";
 
     if (format === "auto") {
-      // auto模式：保持原格式
+      // Auto mode: keep original format, default to webp for best compression
       if (file.type === "image/png") {
         targetFormat = "png";
       } else if (file.type === "image/jpeg" || file.type === "image/jpg") {
         targetFormat = "jpeg";
       } else if (file.type === "image/webp") {
         targetFormat = "webp";
+      } else {
+        // For other formats, convert to webp for best compression
+        targetFormat = "webp";
       }
     } else {
       targetFormat = format as "webp" | "png" | "jpeg";
     }
 
-    // WebP使用前端压缩
-    if (targetFormat === "webp") {
-      const blob = await compressImageToWebP(file);
-      const blobUrl = URL.createObjectURL(blob);
-      return { blob, compressedSize: blob.size, compressedUrl: blobUrl };
-    }
-
-    // PNG/JPEG使用后端API压缩
-    return await compressImageViaAPI(file, targetFormat);
+    // Use browser-based compression for all formats
+    const blob = await compressImageInBrowser(file, targetFormat);
+    const blobUrl = URL.createObjectURL(blob);
+    return { blob, compressedSize: blob.size, compressedUrl: blobUrl };
   };
 
   const handleFiles = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
+
+    // Prevent duplicate processing
+    if (processingRef.current) return;
+    processingRef.current = true;
 
     const validFiles = Array.from(files).filter((file) => {
       if (!file.type.match(/image\/(png|jpe?g|webp)/)) {
@@ -205,7 +147,10 @@ export default function ImageCompressPage() {
       return true;
     });
 
-    if (validFiles.length === 0) return;
+    if (validFiles.length === 0) {
+      processingRef.current = false;
+      return;
+    }
 
     setCompressing(true);
     setProgress(0);
@@ -285,6 +230,7 @@ export default function ImageCompressPage() {
     setCompressing(false);
     setProgress(0);
     setCurrentFile("");
+    processingRef.current = false;
     toast.success(t("compression_success"));
   }, [outputFormat, t]);
 
@@ -307,6 +253,10 @@ export default function ImageCompressPage() {
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFiles(e.target.files);
+    // Reset input value to allow selecting the same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const downloadImage = (image: CompressedImage) => {
@@ -441,6 +391,7 @@ export default function ImageCompressPage() {
                 <h3 className="text-base font-semibold mb-1.5">{t("upload_title")}</h3>
                 <p className="text-xs text-muted-foreground mb-2.5">{t("upload_description")}</p>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   id="file-upload"
                   multiple

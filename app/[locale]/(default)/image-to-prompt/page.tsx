@@ -82,12 +82,17 @@ export default function ImageToPromptPage() {
 
     try {
       // Validate URL format
-      const url = new URL(imageUrl);
+      new URL(imageUrl);
+    } catch {
+      toast.error(t("toast.invalidUrl"));
+      return;
+    }
 
-      // Set preview directly
-      setImagePreview(imageUrl);
+    // Set preview directly - this will work even with CORS
+    setImagePreview(imageUrl);
 
-      // Create a temporary image to verify it loads and convert to File
+    // Try to convert to File for better compatibility, but don't fail if CORS blocks it
+    try {
       const img = document.createElement('img');
       img.crossOrigin = 'anonymous';
 
@@ -97,14 +102,12 @@ export default function ImageToPromptPage() {
         img.src = imageUrl;
       });
 
-      // Convert image to canvas then to blob
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0);
 
-      // Convert canvas to blob
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob((blob) => {
           if (blob) {
@@ -117,19 +120,13 @@ export default function ImageToPromptPage() {
 
       const file = new File([blob], "url-image.jpg", { type: 'image/jpeg' });
       setSelectedImage(file);
-
-      toast.success(t("toast.imageLoaded"));
     } catch (error) {
-      console.error("Error loading image URL:", error);
-      // If CORS fails, still allow the preview but create a fallback
-      if (imagePreview === imageUrl) {
-        toast.warning(t("toast.corsWarning"));
-        // Try to use the URL directly without converting to File
-        // The API will need to handle URL as well
-      } else {
-        toast.error(t("toast.invalidImageUrl"));
-      }
+      console.log("[Image URL] CORS blocked, will use URL directly:", error);
+      // CORS blocked - that's OK, API supports imageUrl directly
+      setSelectedImage(null);
     }
+
+    toast.success(t("toast.imageLoaded"));
   };
 
   const handleGeneratePrompt = async () => {
